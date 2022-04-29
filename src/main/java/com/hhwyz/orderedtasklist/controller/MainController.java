@@ -1,5 +1,6 @@
 package com.hhwyz.orderedtasklist.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.hhwyz.orderedtasklist.dto.TaskDTO;
 import com.hhwyz.orderedtasklist.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +35,14 @@ public class MainController {
 
     }
 
+    @PostMapping("/killTask")
+    public void killTask(String taskUuid) {
+        taskService.killTask(taskUuid);
+    }
+
     @PostMapping("/addTaskToBufferedList")
     public void addTaskToBufferedList(@RequestBody String task) {
-        taskService.addTaskToBufferedList(task);
+        taskService.addTaskToBufferedList(JSON.parseObject(task, String.class));
     }
 
     @GetMapping("/getTwoToCompare")

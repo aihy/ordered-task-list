@@ -31,4 +31,6 @@ public interface TaskService {
     void setCompare(int flag);
 
     void clear();
+
+    void killTask(String taskUuid);
 }

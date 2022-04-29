@@ -141,4 +141,29 @@ public class TaskServiceImpl implements TaskService {
         taskServiceDTO.setTaskOrderedList(new ArrayList<>());
         taskServiceDTO.setTaskBufferedList(new ArrayList<>());
     }
+
+    @Override
+    public void killTask(String taskUuid) {
+        List<TaskDTO> bufferedList = taskServiceDTO.getTaskBufferedList();
+        killFromList(taskUuid, bufferedList);
+        List<TaskDTO> orderedList = taskServiceDTO.getTaskOrderedList();
+        killFromList(taskUuid, orderedList);
+    }
+
+    private void killFromList(String taskUuid, List<TaskDTO> list) {
+        int killIndex = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getTaskUuid().equals(taskUuid)) {
+                killIndex = i;
+                break;
+            }
+        }
+        if (killIndex != -1) {
+            list.remove(killIndex);
+            taskServiceDTO.setTaskAIndex(-1);
+            taskServiceDTO.setTaskBIndex(-1);
+            taskServiceDTO.setLeftIndex(0);
+            taskServiceDTO.setRightIndex(taskServiceDTO.getTaskOrderedList().size() - 1);
+        }
+    }
 }
