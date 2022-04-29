@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="utf-8" content="user-scalable=no, width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>我的空间</title>
+</head>
+
+<body>
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <input autofocus id="newTask">
+    </div>
+    <div class="col">
+      <button id="submitTask">submitTask</button>
+    </div>
+    <div class="col">
+      <button id="clear">clear</button>
+    </div>
+  </div>
+  <div class="row" id="compare">
+  </div>
+  <div class="row">
+    <div class="col">
+      <dl id="ordered"></dl>
+    </div>
+    <div class="col">
+      <dl id="buffered"></dl>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+  function init() {
+    $.ajax({
+      url: "/getTwoToCompare",
+      type: "GET",
+      async: false,
+      success: function (data) {
+        if (data) {
+          $('#compare').empty()
+                  .append("<div class=\"col\">\n" +
+                          "      <button id=\"taskA\">" + data[0].taskContent + "</button>\n" +
+                          "    </div>")
+                  .append("<div class=\"col\">\n" +
+                          "      <button id=\"taskB\">" + data[1].taskContent + "</button>\n" +
+                          "    </div>");
+        }
+      }
+    });
+    $.ajax({
+      url: "/getOrderedTaskList",
+      type: "GET",
+      success: function (data) {
+        if (data) {
+          data.forEach(element => {
+            $("#ordered").append("<dt>" + element.taskContent + "</dt>")
+          });
+        }
+      }
+    });
+    $.ajax({
+      url: "/getBufferedTaskList",
+      type: "GET",
+      success: function (data) {
+        if (data) {
+          data.forEach(element => {
+            $("#buffered").append("<dt>" + element.taskContent + "</dt>")
+          });
+        }
+      }
+    });
+
+  }
+
+  $(document).ready(init());
+  $('#submitTask').click(function () {
+    $.ajax({
+      url: "/addTaskToBufferedList",
+      type: "POST",
+      async: false,
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      data: JSON.stringify($("#newTask").val())
+    });
+    window.location.reload();
+  });
+
+  $('#clear').click(function () {
+    $.ajax({
+      url: "/clear",
+      type: "GET",
+      async: false
+    });
+    window.location.reload();
+  });
+
+  $(document).on('click', '#taskA', function () {
+    $.ajax({
+      url: "/setCompare",
+      type: "POST",
+      async: false,
+      data: {
+        flag: 0
+      }
+    });
+    window.location.reload();
+  });
+
+  $(document).on('click', '#taskB', function () {
+    $.ajax({
+      url: "/setCompare",
+      type: "POST",
+      async: false,
+      data: {
+        flag: 1
+      }
+    });
+    window.location.reload();
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      $('#submitTask').click();
+    }
+    if (event.key === "ArrowLeft") {
+      $('#taskA').click();
+    }
+    if (event.key === "ArrowRight") {
+      $('#taskB').click();
+    }
+  });
+
+
+</script>
+</body>
+
+</html>
